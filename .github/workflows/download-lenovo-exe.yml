@@ -1,0 +1,40 @@
+name: Download Lenovo EXE
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download EXE
+        run: |
+          curl -L \
+            "https://download.lenovo.com/lsa/Releases/Software_Fix_v7.5.5.19_prod_setup.exe" \
+            -o "Software_Fix_v7.5.5.19_prod_setup.exe"
+
+      - name: Show file info
+        run: |
+          ls -lh "Software_Fix_v7.5.5.19_prod_setup.exe"
+          sha256sum "Software_Fix_v7.5.5.19_prod_setup.exe"
+
+      - name: Commit downloaded file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add "Software_Fix_v7.5.5.19_prod_setup.exe"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add Lenovo Software Fix installer"
+            git push
+          fi
